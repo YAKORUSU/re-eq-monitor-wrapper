@@ -48,7 +48,7 @@ GET http://www.kmoni.bosai.go.jp/webservice/hypo/eew/${timestamp}.json
 
 ## Infrastructure
 
-<--!　### 論理構成図
+### 論理構成図
 // TODO
 
 ### WebAPIエンドポイント
