@@ -1,7 +1,7 @@
 import requests
 import datetime
 import time
-from fastapi import FastAPI, Body
+from fastapi import FastAPI
 from starlette.websockets import WebSocket
 import syslog
 
@@ -11,36 +11,39 @@ body = {}
 # websocketで接続中のクライアントを識別するためのIDを格納
 clients = {}
 
-while True:
-    # 現在時刻を取得
-    now = datetime.datetime.now()
 
-    # Timestampの作成
-    timestamp = now.strftime("%Y%m%d%H%M%S")
-    
-    #Jsonの取得
-    url = "http://www.kmoni.bosai.go.jp/webservice/hypo/eew/{}.json".format(timestamp)
-    response = requests.get(url)
+def getjson():
+    while True:
+        # 現在時刻を取得
+        now = datetime.datetime.now()
 
-    if response.status_code == 200:
-        body = response.json()
-        if body["type"] == "eew" and body["report"] == "1" and int(body["intensity"]) >= 3:
-            for client in clients.values():
-                await client.send_text("{}".format(body))
-            syslog.syslog(syslog.LOG_INFO, 'SentAlert:{}'.format(body))
+        # Timestampの作成
+        timestamp = now.strftime("%Y%m%d%H%M%S")
+        
+        #Jsonの取得
+        url = "http://www.kmoni.bosai.go.jp/webservice/hypo/eew/{}.json".format(timestamp)
+        response = requests.get(url)
 
-        # 緊急地震速報以外はキャンセル扱いだが送信してクライアント側で処理
-        elif body["type"] == "pga_alert_cancel":
-            for client in clients.values():
-                await client.send_text("{}".format(body))
-            syslog.syslog(syslog.LOG_DEBUG, 'SentCancelAlert:{}'.format(body))
+        # 発報判定
+        if response.status_code == 200:
+            body = response.json()
+            if body["type"] == "eew" and body["report"] == "1" and int(body["intensity"]) >= 3:
+                for client in clients.values():
+                    await client.send_text("{}".format(body))
+                syslog.syslog(syslog.LOG_INFO, 'SentAlert:{}'.format(body))
+
+            # 緊急地震速報のキャンセル情報は送信してクライアント側で処理
+            elif body["type"] == "pga_alert_cancel":
+                for client in clients.values():
+                    await client.send_text("{}".format(body))
+                syslog.syslog(syslog.LOG_DEBUG, 'SentCancelAlert:{}'.format(body))
+            else:
+                syslog.syslog(syslog.LOG_DEBUG, 'NotSentAlert:{}'.format(body))
         else:
-            syslog.syslog(syslog.LOG_DEBUG, 'NotSentAlert:{}'.format(body))
-    else:
-        print("HTTP GET Request Failed: ", response.status_code)
+            print("HTTP GET Request Failed: ", response.status_code)
 
-    # 1秒待つ
-    time.sleep(1)
+        # 1秒待つ
+        time.sleep(1)
 
 @app.get("/")
 def read():
