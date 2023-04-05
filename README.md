@@ -120,8 +120,8 @@ GET http://www.kmoni.bosai.go.jp/webservice/hypo/eew/${timestamp}.json
 
 ## 備考欄
 
----shell
+```shell
 GET http://www.kmoni.bosai.go.jp/data/map_img/EstShindoImg/eew/${yyyyMMdd}/${yyyyMMddHHmmss}.eew.gif
----
+```
 
 上記URLで全国のリアルタイム情報が取れる(過去のデータは取れないので注意)
