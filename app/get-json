@@ -1,0 +1,25 @@
+import requests
+import datetime
+import time
+
+while True:
+    # 現在時刻を取得
+    now = datetime.datetime.now()
+
+    # Timestampの作成
+    timestamp = now.strftime("%Y%m%d%H%M%S")
+        
+    # URL作成
+    url = "http://www.kmoni.bosai.go.jp/webservice/hypo/eew/{}.json".format(timestamp)
+
+    # JSONをGETリクエストで取得
+    response = requests.get(url) # ここには対象となるAPIのURLを指定します
+    data = response.json() # JSON形式のレスポンスをPythonの辞書型に変換します
+
+    # 取得したデータをlocalhostにPOST
+    post_response = requests.post("http://localhost:8000", json=data) # localhostの対象となるAPIのURLとポートを指定します
+
+    # POSTリクエストの結果を表示
+    print(post_response.status_code)
+
+    time.sleep(1) # 1秒間スリープします
