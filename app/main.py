@@ -16,7 +16,7 @@ def read():
 async def post(body=Body(...)):
 
     #受けた震度が整数値表現できないため換算
-    input_shindo = body["calcintencity"]
+    input_shindo = body["calcintensity"]
     shindo = {"1": 1, "2": 2, "3": 3, "4": 4, "5弱": 5.0, "5強": 5.5, "6弱": 6.0, "6強": 6.5, "7": 7}
 
     # 緊急地震速報がなりすぎると緊急性が失われるので震度3以上の地震のみ通知をするようにする
