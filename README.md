@@ -45,7 +45,7 @@ GET http://www.kmoni.bosai.go.jp/webservice/hypo/eew/${timestamp}.json
 | `magunitude` | string |	マグニチュード |	`"3.8"` |
 | `is_final` | boolean |	最終報か否か |	`false` |
 | `is_cancel` |	boolean |	キャンセル報か否か(未利用?) |	`false` |
-| 'is_training` |	boolean |	訓練報か否か | `false` |
+| `is_training` |	boolean |	訓練報か否か | `false` |
 
 
 ## Infrastructure
