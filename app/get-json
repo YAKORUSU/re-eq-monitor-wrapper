@@ -1,25 +1,23 @@
+# 現在時刻の2秒前を取得して、その時刻の緊急地震速報を取得する
+# 例: 2021年1月1日12時00分00秒の場合、20210101115958の緊急地震速報を取得する
 import requests
 import datetime
 import time
+import json
 
+# Get Earthquake Early Warning (EEW) data from Kmoni API
 while True:
-    # 現在時刻を取得
-    now = datetime.datetime.now()
-
-    # Timestampの作成
+    now = datetime.datetime.now() - datetime.timedelta(seconds=2)
     timestamp = now.strftime("%Y%m%d%H%M%S")
-        
-    # URL作成
     url = "http://www.kmoni.bosai.go.jp/webservice/hypo/eew/{}.json".format(timestamp)
+    response = requests.get(url)
+    #textをjsonに変換
+    data = json.loads(response.text)
 
-    # JSONをGETリクエストで取得
-    response = requests.get(url) # ここには対象となるAPIのURLを指定します
-    data = response.json() # JSON形式のレスポンスをPythonの辞書型に変換します
-
-    # 取得したデータをlocalhostにPOST
-    post_response = requests.post("http://localhost:8000", json=data) # localhostの対象となるAPIのURLとポートを指定します
-
-    # POSTリクエストの結果を表示
+    # Post EEW data to local API
+    post_response = requests.post("http://localhost:8000", json=data)
+    print(response.status_code)
+    print(response.text)
     print(post_response.status_code)
-
-    time.sleep(1) # 1秒間スリープします
+    print(post_response.text)
+    time.sleep(1)
